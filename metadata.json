@@ -1,0 +1,11 @@
+{
+  "description": "Module dependency analyzer for the Elvish shell",
+
+  "maintainers": ["Gianluca Costa <gianluca@gianlucacosta.info>"],
+
+  "homepage": "https://github.com/giancosta86/primrose",
+
+  "dependencies": ["github.com/giancosta86/ethereal@v1"],
+
+  "devDependencies": ["github.com/giancosta86/velvet@v3"]
+}
