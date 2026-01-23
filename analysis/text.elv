@@ -1,6 +1,6 @@
+use github.com/giancosta86/ethereal/v1/seq
 
-
-fn analyze { |content line-number-text-consumer|
+fn line-by-line { |content line-number-text-consumer|
   echo $content |
     from-lines |
     seq:enumerate &start-index=1 |
