@@ -1,5 +1,5 @@
 {
-  "description": "Module dependency analyzer for the Elvish shell",
+  "description": "Elegant file analysis in Elvish",
 
   "maintainers": ["Gianluca Costa <gianluca@gianlucacosta.info>"],
 
