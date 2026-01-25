@@ -1,9 +1,9 @@
-use ./ns-identifiers
+use ./qualified-identifiers
 
->> 'Parsing namespaced identifiers' {
+>> 'Parsing qualified identifiers' {
   >> 'when parsing each identifier individually' {
     >> 'parsing a basic identifier' {
-      ns-identifiers:find-all 'alpha:beta' |
+      qualified-identifiers:find-all 'alpha:beta' |
         should-emit [
           [
             &line-number=1
@@ -14,7 +14,7 @@ use ./ns-identifiers
     }
 
     >> 'parsing a callable identifier' {
-      ns-identifiers:find-all 'alpha:fi~' |
+      qualified-identifiers:find-all 'alpha:fi~' |
         should-emit [
           [
             &line-number=1
@@ -25,7 +25,7 @@ use ./ns-identifiers
     }
 
     >> 'parsing a variable identifier' {
-      ns-identifiers:find-all '$alpha:my-var' |
+      qualified-identifiers:find-all '$alpha:my-var' |
         should-emit [
           [
             &line-number=1
@@ -36,7 +36,7 @@ use ./ns-identifiers
     }
 
     >> 'parsing a multi-namespace identifier' {
-      ns-identifiers:find-all '$alpha:beta:gamma:delta' |
+      qualified-identifiers:find-all '$alpha:beta:gamma:delta' |
         should-emit [
           [
             &line-number=1
@@ -47,7 +47,7 @@ use ./ns-identifiers
     }
 
     >> 'parsing a functional identifier between brackets' {
-      ns-identifiers:find-all '&reporters=[$cli:display~]' |
+      qualified-identifiers:find-all '&reporters=[$cli:display~]' |
         should-emit [
           [
             &line-number=1
@@ -58,7 +58,7 @@ use ./ns-identifiers
     }
 
     >> 'parsing a redirection merged with a scoped variable' {
-      ns-identifiers:find-all 'echo Test 2>$os:dev-null' |
+      qualified-identifiers:find-all 'echo Test 2>$os:dev-null' |
         should-be [
           &line-number=1
           &namespace=os
@@ -68,7 +68,7 @@ use ./ns-identifiers
 
     >> 'parsing a string with escaped \n' {
       >> 'should find no identifier' {
-        ns-identifiers:find-all 'Description:\nTest' |
+        qualified-identifiers:find-all 'Description:\nTest' |
           count |
           should-be 0
       }
@@ -76,7 +76,7 @@ use ./ns-identifiers
 
     >> 'parsing a colon between two variables' {
       >> 'should find no identifier' {
-        ns-identifiers:find-all "$alpha':'$beta" |
+        qualified-identifiers:find-all "$alpha':'$beta" |
           count |
           should-be 0
       }
@@ -84,16 +84,16 @@ use ./ns-identifiers
 
     >> 'parsing a colon followed by a space' {
       >> 'should find no identifier' {
-        ns-identifiers:find-all 'Name: ' |
+        qualified-identifiers:find-all 'Name: ' |
           count |
           should-be 0
       }
     }
   }
 
-  >> 'when parsing multiple namespaced identifiers in the same source code' {
+  >> 'when parsing multiple qualified identifiers in the same source code' {
     var parsed-identifiers = [(
-      ns-identifiers:find-all 'This is some sample string that should be a source code file.
+      qualified-identifiers:find-all 'This is some sample string that should be a source code file.
 
       Colons followed by spaces like this: should not be parsed. Nor :a, :b or similar ones.
 

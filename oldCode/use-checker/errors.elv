@@ -4,7 +4,7 @@ use ../../hash-set
 use ../../map
 use ../../seq
 use ../syntax/analysis
-use ../syntax/ns-identifiers
+use ../syntax/qualified-identifiers
 use ../syntax/uses
 
 fn -find-superfluous-uses { |uses use-namespaces accessed-namespaces|
@@ -18,12 +18,12 @@ fn -find-superfluous-uses { |uses use-namespaces accessed-namespaces|
     ] }
 }
 
-fn -find-dangling-namespaces { |ns-identifiers use-namespaces accessed-namespaces|
+fn -find-dangling-namespaces { |qualified-identifiers use-namespaces accessed-namespaces|
   var dangling-namespaces = (hash-set:difference $accessed-namespaces $use-namespaces)
 
-  all $ns-identifiers |
-    keep-if { |ns-identifier|
-      hash-set:contains $dangling-namespaces $ns-identifier[namespace]
+  all $qualified-identifiers |
+    keep-if { |qualified-identifier|
+      hash-set:contains $dangling-namespaces $qualified-identifier[namespace]
     }
 }
 
@@ -46,7 +46,7 @@ fn find { |
     var uses = [(uses:parse $content)]
 
     var use-namespaces
-    var ns-identifiers
+    var qualified-identifiers
     var accessed-namespaces
 
     if (or $superfluous-uses $dangling-namespaces) {
@@ -56,11 +56,11 @@ fn find { |
           hash-set:from
       )
 
-      set ns-identifiers = [(ns-identifiers:parse $content)]
+      set qualified-identifiers = [(qualified-identifiers:parse $content)]
 
       set accessed-namespaces = (
-        all $ns-identifiers |
-          each { |ns-identifier| put $ns-identifier[namespace] } |
+        all $qualified-identifiers |
+          each { |qualified-identifier| put $qualified-identifier[namespace] } |
           hash-set:from
       )
     }
@@ -77,7 +77,7 @@ fn find { |
 
     if $dangling-namespaces {
       set file-result = (
-        -find-dangling-namespaces $ns-identifiers $use-namespaces $accessed-namespaces |
+        -find-dangling-namespaces $qualified-identifiers $use-namespaces $accessed-namespaces |
           seq:empty-to-default [(all)] |
           map:assoc-non-nil $file-result dangling-namespaces (all)
       )
