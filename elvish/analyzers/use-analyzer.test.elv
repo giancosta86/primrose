@@ -1,3 +1,4 @@
+use github.com/giancosta86/ethereal/v1/seq
 use ../uses
 use ./use-analyzer
 
@@ -79,8 +80,17 @@ fn expect-uses { |&kinds=$nil expected-uses|
     }
   )
 
-  $use-analyzer (src)[name] $test-source-code |
-    should-emit $expected-uses
+  var actual-result-map = ($use-analyzer (src)[name] $test-source-code)
+
+  if (seq:is-non-empty $expected-uses) {
+    put $actual-result-map |
+      should-be [
+        &uses=$expected-uses
+      ]
+  } else {
+    put $actual-result-map |
+      should-be $nil
+  }
 }
 
 >> 'Elvish analyzers' {
