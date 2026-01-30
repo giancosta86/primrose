@@ -1,6 +1,6 @@
 use ./files
 
-fn with-temp-source-tree { |block|
+fn with-temp-sources { |block|
   fs:with-temp-dir { |temp-dir|
     tmp pwd = $temp-dir
 
@@ -38,7 +38,7 @@ fn beta-excluding-analyzer { |path content|
 >> 'Analysis' {
   >> 'by files' {
     >> 'should provide a merged map of results, whose key is the file path' {
-      with-temp-source-tree { |temp-files|
+      with-temp-sources { |temp-files|
         all $temp-files |
           files:analyze $file-length-analyzer~ |
           should-be [
@@ -55,8 +55,8 @@ fn beta-excluding-analyzer { |path content|
         }
     }
 
-    >> 'should be able to set a sub-map as the result for each file' {
-      with-temp-source-tree { |temp-files|
+    >> 'should provide a sub-map as the result for each file' {
+      with-temp-sources { |temp-files|
         all $temp-files |
           files:analyze $more-sophisticated-analyzer~ |
           should-be [
@@ -77,7 +77,7 @@ fn beta-excluding-analyzer { |path content|
     }
 
     >> 'should not report a path having $nil as its analysis result' {
-      with-temp-source-tree { |temp-files|
+      with-temp-sources { |temp-files|
         all $temp-files |
           files:analyze $beta-excluding-analyzer~ |
           should-be [
@@ -92,7 +92,7 @@ fn beta-excluding-analyzer { |path content|
     }
 
     >> 'should support multiple analyzers' {
-      with-temp-source-tree { |temp-files|
+      with-temp-sources { |temp-files|
         all $temp-files |
           files:analyze $file-length-analyzer~ $more-sophisticated-analyzer~ |
           should-be [
@@ -112,6 +112,20 @@ fn beta-excluding-analyzer { |path content|
               &length=5
             ]
           ]
+      }
+    }
+
+    >> 'when not passing files' {
+      all [] |
+        files:analyze $file-length-analyzer~ $more-sophisticated-analyzer~ |
+        should-be [&]
+    }
+
+    >> 'when not passing analyzers' {
+      with-temp-sources { |temp-files|
+        all $temp-files |
+          files:analyze |
+          should-be [&]
       }
     }
   }
