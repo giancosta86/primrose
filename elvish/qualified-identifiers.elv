@@ -1,10 +1,28 @@
 use re
+use str
 use ../analysis/text
 
 var -ns-identifier-regex = '([A-Za-z0-9\-]+):([A-Za-z0-9\-~:]+)'
 
+#
+# Emits the qualified identifiers - i.e., «A:B» - in the given Elvish source code.
+#
+# Every emitted identifier is a map having the following fields:
+#
+# * `line-number`
+#
+# * `namespace` - the part before the ":"
+#
+# * `identifier` - the part after the ":"
+#
+# In case of multiple namespaces, only leftmost one constitutes the `namespace` field.
+#
 fn find-all { |source-code|
   text:line-by-line $source-code { |line-number line|
+    if (str:has-prefix $line '#') {
+      continue
+    }
+
     re:find $-ns-identifier-regex $line | each { |match|
       var groups = $match[groups]
 

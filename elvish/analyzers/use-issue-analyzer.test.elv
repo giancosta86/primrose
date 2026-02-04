@@ -26,6 +26,7 @@ fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &
   )
 
   var analyzer = (use-issue-analyzer:create &superfluous-uses=$superfluous-uses &dangling-identifiers=$dangling-identifiers &missing-relative-uses=$missing-relative-uses)
+
   var actual-warning-map = ($analyzer (src)[name] $source-code)
 
   if $expected-warning-map {

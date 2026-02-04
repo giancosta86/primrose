@@ -4,56 +4,46 @@ use ./qualified-identifiers
   >> 'when parsing each identifier individually' {
     >> 'parsing a basic identifier' {
       qualified-identifiers:find-all 'alpha:beta' |
-        should-emit [
-          [
-            &line-number=1
-            &namespace=alpha
-            &identifier=beta
-          ]
+        should-be [
+          &line-number=1
+          &namespace=alpha
+          &identifier=beta
         ]
     }
 
     >> 'parsing a callable identifier' {
       qualified-identifiers:find-all 'alpha:fi~' |
-        should-emit [
-          [
-            &line-number=1
-            &namespace=alpha
-            &identifier=fi~
-          ]
+        should-be [
+          &line-number=1
+          &namespace=alpha
+          &identifier=fi~
         ]
     }
 
     >> 'parsing a variable identifier' {
       qualified-identifiers:find-all '$alpha:my-var' |
-        should-emit [
-          [
-            &line-number=1
-            &namespace=alpha
-            &identifier=my-var
-          ]
+        should-be [
+          &line-number=1
+          &namespace=alpha
+          &identifier=my-var
         ]
     }
 
     >> 'parsing a multi-namespace identifier' {
       qualified-identifiers:find-all '$alpha:beta:gamma:delta' |
-        should-emit [
-          [
-            &line-number=1
-            &namespace=alpha
-            &identifier=beta:gamma:delta
-          ]
+        should-be [
+          &line-number=1
+          &namespace=alpha
+          &identifier=beta:gamma:delta
         ]
     }
 
     >> 'parsing a functional identifier between brackets' {
       qualified-identifiers:find-all '&reporters=[$cli:display~]' |
-        should-emit [
-          [
-            &line-number=1
-            &namespace=cli
-            &identifier=display~
-          ]
+        should-be [
+          &line-number=1
+          &namespace=cli
+          &identifier=display~
         ]
     }
 
@@ -69,31 +59,28 @@ use ./qualified-identifiers
     >> 'parsing a string with escaped \n' {
       >> 'should find no identifier' {
         qualified-identifiers:find-all 'Description:\nTest' |
-          count |
-          should-be 0
+          should-emit []
       }
     }
 
     >> 'parsing a colon between two variables' {
       >> 'should find no identifier' {
         qualified-identifiers:find-all "$alpha':'$beta" |
-          count |
-          should-be 0
+          should-emit []
       }
     }
 
     >> 'parsing a colon followed by a space' {
       >> 'should find no identifier' {
         qualified-identifiers:find-all 'Name: ' |
-          count |
-          should-be 0
+          should-emit []
       }
     }
   }
 
-  >> 'when parsing multiple qualified identifiers in the same source code' {
-    var parsed-identifiers = [(
-      qualified-identifiers:find-all 'This is some sample string that should be a source code file.
+  >> 'parsing multiple qualified identifiers in the same source code' {
+    all [
+      'This is some sample string that should be a source code file.
 
       Colons followed by spaces like this: should not be parsed. Nor :a, :b or similar ones.
 
@@ -105,47 +92,36 @@ use ./qualified-identifiers
 
       * [Multi-namespace identifier -> $alpha:beta:gamma:delta)
       '
-    )]
-
-    >> 'should parse them all' {
-      count $parsed-identifiers |
-        should-be 4
-    }
-
-    >> 'should parse a basic identifier' {
-      put $parsed-identifiers[0] |
-        should-be [
+    ] |
+      to-lines |
+      slurp |
+      qualified-identifiers:find-all (all) |
+      should-emit [
+        [
           &line-number=5
           &namespace=alpha
           &identifier=beta
         ]
-    }
-
-    >> 'should parse a callable identifier' {
-      put $parsed-identifiers[1] |
-        should-be [
+        [
           &line-number=7
           &namespace=alpha
           &identifier=fi~
         ]
-    }
-
-    >> 'should parse a variable identifier' {
-      put $parsed-identifiers[2] |
-        should-be [
+        [
           &line-number=9
           &namespace=alpha
           &identifier=my-var
         ]
-    }
-
-    >> 'should parse a multi-namespace identifier' {
-      put $parsed-identifiers[3] |
-        should-be [
+        [
           &line-number=11
           &namespace=alpha
           &identifier=beta:gamma:delta
         ]
-    }
+      ]
+  }
+
+  >> 'should skip comment lines' {
+    qualified-identifiers:find-all '# alpha:beta' |
+      should-emit [ ]
   }
 }

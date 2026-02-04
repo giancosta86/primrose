@@ -9,13 +9,35 @@ var relative = 'R'
 
 var -use-regex = '(?m)^\s*use\s+(\S+)(?:\s+(\S+))?\s*(?:#.*)?$'
 
+#
+# Emits all the `use` declarations in the given Elvish source code.
+#
+# Each declaration is emitted as a map containing the following fields:
+#
+# * `line-number`
+#
+# * `reference`: the imported module
+#
+# * `alias`: the alias used to import the module, or $nil
+#
+# * `namespace`: the namespace used to access the module; if coincides with `alias` if it's not $nil,
+#   otherwise it's the last path component in `reference`
+#
+# * `kind`: can be one of the 3 constants provided by this module:
+#
+#   * `standard` (**S**): the module belongs to the Elvish library
+#
+#   * `absolute` (**A**): external, fully-qualified module
+#
+#   * 'relative' (**R**): module whose path is relative to the importing module
+#
 fn find-all { |&kinds=[$standard $absolute $relative] source-code|
   text:line-by-line $source-code { |line-number line|
     re:find $-use-regex $line | each { |match|
       var groups = $match[groups]
 
       var reference = $groups[1][text]
-      var alias = (seq:coalesce-empty $groups[2][text])
+      var alias = (seq:empty-to-default $groups[2][text])
 
       var reference-components = [(str:split / $reference)]
 

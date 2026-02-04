@@ -82,7 +82,7 @@ fn expect-uses { |&kinds=$nil expected-uses|
 
   var actual-result-map = ($use-analyzer (src)[name] $test-source-code)
 
-  if (seq:is-non-empty $expected-uses) {
+  if $expected-uses {
     put $actual-result-map |
       should-be [
         &uses=$expected-uses
@@ -109,7 +109,7 @@ fn expect-uses { |&kinds=$nil expected-uses|
       expect-uses &kinds=[$uses:standard] $expected-standard-uses
     }
 
-    >> 'when requesting a set of kind of uses' {
+    >> 'when requesting a set of kinds of uses' {
       expect-uses &kinds=[$uses:standard $uses:relative] [
         $@expected-standard-uses
         $@expected-relative-uses
@@ -117,7 +117,7 @@ fn expect-uses { |&kinds=$nil expected-uses|
     }
 
     >> 'when requesting no uses' {
-      expect-uses &kinds=[] []
+      expect-uses &kinds=[] $nil
     }
   }
 }

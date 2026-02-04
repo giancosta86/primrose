@@ -21,11 +21,7 @@ fn -create-chunk-analysis-function { |analyzers|
 
       var analyzer-results = (-run-analyzers-on-file $analyzers $file-path $file-content)
 
-      if (seq:is-non-empty $analyzer-results) {
-        assoc $results-by-file $file-path $analyzer-results
-      } else {
-        put $results-by-file
-      }
+      seq:assoc-substantial $results-by-file $file-path $analyzer-results
     }
   }
 }
