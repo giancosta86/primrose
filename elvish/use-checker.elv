@@ -2,6 +2,7 @@ use str
 use github.com/giancosta86/ethereal/v1/seq
 use ../analysis/files
 use ./analyzers/use-issue-analyzer
+use ./source-files
 
 fn -log-issue { |file-path issue|
   var message = (one)
@@ -55,16 +56,20 @@ fn -format-issues { |issues|
   }
 }
 
-fn check-uses { |&include-tests=$false &raw=$false &superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
+#
+# Analyzes all the Elvish scripts in the current directory tree, emitting issues related to use declarations.
+#
+# It supports the following flags:
+#
+# * `&tests`: also check `.test.elv` files. Disabled by default.
+#
+# * `raw`: emit a **map** in lieu of formatted output lines. Disabled by default.
+#
+# * `superfluous-uses`, `dangling-identifiers`, `missing-relative-uses`: the supported issue types. All enabled by default.
+#
+fn check-uses { |&tests=$false &raw=$false &superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
   var issues = (
-    put **.elv |
-      keep-if { |file-path|
-        if $include-tests {
-          put $true
-        } else {
-          not (str:has-suffix $file-path '.test.elv')
-        }
-      } |
+    source-files:get-all &tests=$tests |
       files:analyze (
         use-issue-analyzer:create ^
           &superfluous-uses=$superfluous-uses ^

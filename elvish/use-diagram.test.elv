@@ -1,7 +1,7 @@
 use str
 use ./use-diagram
 
->> 'Use diagram' {
+>> 'Elvish use diagram' {
   >> 'should generate the expected output' {
     var output-tester = (
       put ../**.elv |

@@ -4,13 +4,6 @@ use github.com/giancosta86/ethereal/v1/set
 use ../uses
 use ./use-issue-analyzer
 
-var lines-with-all-issues = [
-  'use path'
-  'use ./DODO'
-
-  'cip:f 90'
-]
-
 fn to-map-of-sets { |@arguments|
   lang:get-single-input $arguments |
     map:transform (all) { |key value|
@@ -129,49 +122,58 @@ fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &
       ]
     }
 
-    >> 'by default' {
-      >> 'should find all issues at once' {
-        all $lines-with-all-issues | should-emit-warnings [
-          &superfluous-uses=[
-            [
-              &line-number=1
-              &reference=path
-              &alias=$nil
-              &namespace=path
-              &kind=$uses:standard
-            ]
-            [
-              &line-number=2
-              &reference=./DODO
-              &alias=$nil
-              &namespace=DODO
-              &kind=$uses:relative
-            ]
-          ]
-          &dangling-identifiers=[
-            [
-              &line-number=3
-              &namespace=cip
-              &identifier=f
-            ]
-          ]
-          &missing-relative-uses=[
-            [
-              &line-number=2
-              &reference=./DODO
-              &alias=$nil
-              &namespace=DODO
-              &kind=$uses:relative
-            ]
-          ]
-        ]
-      }
-    }
+    >> 'in source code with all the issue kinds' {
+      var lines-with-all-issues = [
+        'use path'
+        'use ./DODO'
+        ''
+        'cip:f 90'
+      ]
 
-    >> 'when disabling all flags' {
-      >> 'should emit $nil' {
-        all $lines-with-all-issues |
-          should-emit-warnings &superfluous-uses=$false &dangling-identifiers=$false &missing-relative-uses=$false $nil
+      >> 'by default' {
+        >> 'should find all issues at once' {
+          all $lines-with-all-issues | should-emit-warnings [
+            &superfluous-uses=[
+              [
+                &line-number=1
+                &reference=path
+                &alias=$nil
+                &namespace=path
+                &kind=$uses:standard
+              ]
+              [
+                &line-number=2
+                &reference=./DODO
+                &alias=$nil
+                &namespace=DODO
+                &kind=$uses:relative
+              ]
+            ]
+            &dangling-identifiers=[
+              [
+                &line-number=4
+                &namespace=cip
+                &identifier=f
+              ]
+            ]
+            &missing-relative-uses=[
+              [
+                &line-number=2
+                &reference=./DODO
+                &alias=$nil
+                &namespace=DODO
+                &kind=$uses:relative
+              ]
+            ]
+          ]
+        }
+      }
+
+      >> 'when disabling all flags' {
+        >> 'should emit $nil' {
+          all $lines-with-all-issues |
+            should-emit-warnings &superfluous-uses=$false &dangling-identifiers=$false &missing-relative-uses=$false $nil
+        }
       }
     }
   }

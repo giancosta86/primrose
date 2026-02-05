@@ -12,7 +12,7 @@ use ./source-files
   }
 
   >> 'when including test files' {
-    var actual-files = [(source-files:get-all &include-tests)]
+    var actual-files = [(source-files:get-all &tests)]
 
     put $actual-files |
       should-contain source-files.elv
