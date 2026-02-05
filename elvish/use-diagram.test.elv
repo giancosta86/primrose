@@ -3,10 +3,11 @@ use ./use-diagram
 
 >> 'Elvish use diagram' {
   >> 'should generate the expected output' {
+    tmp pwd = ..
+
     var output-tester = (
-      put ../**.elv |
-        keep-if { |source-path| not (str:has-suffix $source-path .test.elv) } |
-        use-diagram:get-mermaid-source |
+      fs:find-scripts |
+        use-diagram:get-mermaid |
         output-tester:create
     )
 
@@ -15,11 +16,11 @@ use ./use-diagram
 
       'flowchart BT'
 
-      '../elvish/use-diagram.elv[../elvish/use-diagram.elv] --> path{{path}}'
+      'elvish/use-diagram.elv[elvish/use-diagram.elv] --> path{{path}}'
 
-      '../elvish/use-diagram.elv[../elvish/use-diagram.elv] --> github.com/giancosta86/ethereal/v1/map(github.com/giancosta86/ethereal/v1/map)'
+      'elvish/use-diagram.elv[elvish/use-diagram.elv] --> github.com/giancosta86/ethereal/v1/map(github.com/giancosta86/ethereal/v1/map)'
 
-      '../elvish/use-diagram.elv[../elvish/use-diagram.elv] --> ../analysis/files[../analysis/files]'
+      'elvish/use-diagram.elv[elvish/use-diagram.elv] --> analysis/files[analysis/files]'
     ]
   }
 }

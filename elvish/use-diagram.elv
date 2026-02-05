@@ -38,7 +38,7 @@ fn -print-uses { |source-path uses|
   }
 }
 
-fn get-mermaid-source { |&kinds=[$uses:standard $uses:absolute $uses:relative]|
+fn get-mermaid { |&kinds=[$uses:standard $uses:absolute $uses:relative]|
   all [
     '---'
     'config:'

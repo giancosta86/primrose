@@ -83,7 +83,7 @@ fn in-custom-temp-dir { |block|
   >> 'when including tests' {
     in-custom-temp-dir {
       var output-tester = (
-        use-checker:check-uses &tests |
+        use-checker:check-uses &include-tests |
           output-tester:create &unstyled
       )
 
@@ -102,7 +102,7 @@ fn in-custom-temp-dir { |block|
 
   >> 'when enabling raw input' {
     in-custom-temp-dir {
-      use-checker:check-uses &tests &raw |
+      use-checker:check-uses &include-tests &raw |
         should-be [
           &source.elv=$expected-issues-in-file
           &source.test.elv=$expected-issues-in-file

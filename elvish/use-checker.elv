@@ -1,8 +1,8 @@
 use str
+use github.com/giancosta86/ethereal/v1/fs
 use github.com/giancosta86/ethereal/v1/seq
 use ../analysis/files
 use ./analyzers/use-issue-analyzer
-use ./source-files
 
 fn -log-issue { |file-path issue|
   var message = (one)
@@ -61,15 +61,15 @@ fn -format-issues { |issues|
 #
 # It supports the following flags:
 #
-# * `&tests`: also check `.test.elv` files. Disabled by default.
+# * `&include-tests`: enable checks for `.test.elv` files, too. Disabled by default.
 #
 # * `raw`: emit a **map** in lieu of formatted output lines. Disabled by default.
 #
 # * `superfluous-uses`, `dangling-identifiers`, `missing-relative-uses`: the supported issue types. All enabled by default.
 #
-fn check-uses { |&tests=$false &raw=$false &superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
+fn check-uses { |&include-tests=$false &raw=$false &superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
   var issues = (
-    source-files:get-all &tests=$tests |
+    fs:find-scripts &include-tests=$include-tests |
       files:analyze (
         use-issue-analyzer:create ^
           &superfluous-uses=$superfluous-uses ^
