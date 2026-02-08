@@ -2,20 +2,26 @@
 
 _Elegant file analysis in Elvish_
 
-![Use diagram](use-diagram.svg)
+![Use diagram](docs/use-diagram.svg)
 
-**primrose** is a simple but _performant_ tool for analyzing file content in the [Elvish](https://elv.sh/) shell; in particular, it features:
+**primrose** is a simple but _performant_ library for analyzing file content in the [Elvish](https://elv.sh/) shell; in particular, it features:
 
 - a general-purpose **analysis infrastructure**
 
-- **analysis tool** for the Elvish language
+- _regex-based_ **analysis functions** for the **Elvish** language
 
-- a **linter** for the `use` declaration, currently detecting:
-  - superfluous uses
+- a **linter** for `use` declarations in **Elvish**, currently detecting:
+  - **superfluous uses**
 
-  - namespaces having no imports (_dangling references_)
+  - namespaces having no imports (**dangling references**)
 
-  - relative imports pointing to inexistent files
+  - **relative imports** pointing to _inexistent files_
+
+* a **dependency diagram generator** for **Elvish**, emitting the source code of a [Mermaid](https://mermaid.ai/) flowchart.
+
+The *overall architecture* can be summarized as follows:
+
+![Architecture](docs/architecture.svg)
 
 ## Installation
 
@@ -35,21 +41,62 @@ epm:install github.com/giancosta86/primrose@v1
 
 or any other specific Git reference.
 
-## Setup
+## Command-line tools
 
-In **rc.elv**, it is recommended to add the following lines:
+### Usage checker
+
+To make it available, it is recommended to add the following lines to **rc.elv**:
 
 ```elvish
-use github.com/giancosta86/velvet/velvet
+use github.com/giancosta86/primrose/v1/elvish/use-checker
 
-var velvet~ = $velvet:velvet~
+var check-uses~ = $use-checker:check-uses~
 ```
 
-This will make the `velvet` command globally available at the command prompt.
+This will make the `check-uses` command globally available at the command prompt.
+
+Then, in your project directory, just run
+
+```elvish
+check-uses
+```
+
+The command also supports more options - please, refer to the [module](elvish/use-checker.elv) documentation for details.
+
+
+### Diagram generator
+
+To make it available, it is recommended to add the following lines to **rc.elv**:
+
+```elvish
+use github.com/giancosta86/primrose/v1/elvish/use-diagram
+
+var use-diagram~ = $use-diagram:get-mermaid~
+```
+
+This will make the `use-diagram` command globally available at the command prompt.
+
+Then, in your project directory, just run
+
+```elvish
+use-diagram
+```
+
+The generated output can be procesed by tools supporting Mermaid's syntax - such as the related [playground](https://mermaid.ai/play) or the [command-line tool](https://www.npmjs.com/package/@mermaid-js/mermaid-cli)
+
+The command also supports more options - please, refer to the [module](elvish/use-diagram.elv) documentation for details.
+
+## Elvish source analysis core
+
+The most important modules for analyzing source files - and the very heart of the related command-line tools - are:
+
+- [qualified-identifiers](elvish/qualified-identifiers.elv)
+
+- [uses](elvish/uses.elv)
 
 ## General-purpose analysis
 
-The `analyze` function, residing in the `analysis/files` module, runs parallel analysis of source files - representing the very heart of the use analyzer; please, refer to its [source file](analysis/files.elv) for the documentation and, even more, to its [test suite](analysis/files.test.elv) for examples using it.
+The `analyze` function, residing in the `analysis/files` module, runs **parallel analysis** of source files - representing the very heart of the entire library; please, refer to its [source file](analysis/files.elv) for the documentation and, even more, to its [test suite](analysis/files.test.elv) for examples using it.
 
 Similarly, the `line-by-line` function in the `analysis/text` module provides a valuable utility for analyzing text content.
 
@@ -60,5 +107,8 @@ Similarly, the `line-by-line` function in the `analysis/text` module provides a 
 - [Velvet](https://github.com/giancosta86/velvet) - _Smooth, functional testing in the Elvish shell_
 
 - [epm-plus](https://github.com/giancosta86/epm-plus) - _Package versioning for epm in Elvish_
+
+- [Mermaid](https://mermaid.ai/) - _Faster, smarter diagramming for teams —
+  with markdown-style code and AI_
 
 - [Elvish](https://elv.sh/)

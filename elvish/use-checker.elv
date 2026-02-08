@@ -1,4 +1,3 @@
-use str
 use github.com/giancosta86/ethereal/v1/fs
 use github.com/giancosta86/ethereal/v1/seq
 use ../analysis/files
@@ -61,7 +60,7 @@ fn -format-issues { |issues|
 #
 # It supports the following flags:
 #
-# * `&include-tests`: enable checks for `.test.elv` files, too. Disabled by default.
+# * `include-tests`: enable checks for `.test.elv` files, too. Disabled by default.
 #
 # * `raw`: emit a **map** in lieu of formatted output lines. Disabled by default.
 #
