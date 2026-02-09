@@ -2,41 +2,31 @@ use github.com/giancosta86/ethereal/v1/set
 use ../uses
 use ./shared
 
-var -prologue = ^
-'digraph useDiagram {
-  rankdir=BT;
-
-  graph [
-    overlap=false,
-    splines=polyline,
-    nodesep=1.2,
-    ranksep=4,
-    pad="1,1"
-  ];
-
-  node [
-    shape=box,
-    style="filled",
-    fillcolor="'$shared:relative-color'",
-    fontname="Helvetica-Bold",
-    penwidth=2
-  ];
-'
-
-var -node-suffix-by-kind = [
-  &$uses:standard=' [shape=hexagon, style=filled, fillcolor="'$shared:standard-color'"];'
-  &$uses:absolute=' [shape=box, style="rounded,filled", fillcolor="'$shared:absolute-color'"];'
-  &$uses:relative=';'
-]
-
 fn create-diagram-printer { |&colors=$false|
   var use-declarations = $set:empty
   var reference-pairs = []
 
+  var node-suffix-by-kind = (
+    if $colors {
+      put [
+        &$uses:standard=' [shape=hexagon, style=filled, fillcolor="'$shared:standard-color'"];'
+        &$uses:absolute=' [shape=box, style="rounded,filled", fillcolor="'$shared:absolute-color'"];'
+      ]
+    } else {
+      put [
+        &$uses:standard=' [shape=hexagon, style=solid];'
+        &$uses:absolute=' [shape=box, style=solid];'
+      ]
+    }
+  )
+
+
   fn print-use-declarations {
     put $use-declarations |
       set:iterate { |use-declaration|
-        echo '  "'$use-declaration[actual-reference]'"'$-node-suffix-by-kind[$use-declaration[kind]]
+        if (has-key $node-suffix-by-kind $use-declaration[kind]) {
+          echo '  "'$use-declaration[actual-reference]'"'$node-suffix-by-kind[$use-declaration[kind]]
+        }
       }
   }
 
@@ -50,7 +40,28 @@ fn create-diagram-printer { |&colors=$false|
 
   put [
     &start={
-      echo $-prologue
+      var prologue = ^
+        'digraph useDiagram {
+          rankdir=BT;
+
+          graph [
+            overlap=false,
+            splines=polyline,
+            nodesep=1.2,
+            ranksep=4,
+            pad="1,1"
+          ];
+
+          node [
+            shape=box,
+            style="filled",
+            '(if $colors { echo 'fillcolor="'$shared:relative-color'",' } else { echo '' })'
+            fontname="Helvetica-Bold",
+            penwidth=2
+          ];
+        '
+
+      echo $prologue
     }
 
     &notify-use-declaration={ |source-module use-declaration|
