@@ -2,7 +2,7 @@
 
 _Elegant file analysis in Elvish_
 
-![Use diagram](docs/use-diagram.svg)
+![Use diagram](docs/use-diagram.jpg)
 
 **primrose** is a simple but _performant_ library for analyzing file content in the [Elvish](https://elv.sh/) shell; in particular, it features:
 

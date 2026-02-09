@@ -2,12 +2,12 @@ use str
 use ./use-diagram
 
 >> 'Elvish use diagram' {
-  >> 'should generate the expected output' {
+  >> 'when requesting Mermaid format' {
     tmp pwd = ..
 
     var output-tester = (
       fs:find-scripts |
-        use-diagram:get-mermaid |
+        use-diagram:use-diagram &format=mermaid |
         output-tester:create
     )
 
@@ -16,11 +16,11 @@ use ./use-diagram
 
       'flowchart BT'
 
-      'elvish/use-diagram.elv[elvish/use-diagram.elv] --> path{{path}}'
+      'elvish/use-diagram[elvish/use-diagram] --> path{{path}}'
 
-      'elvish/use-diagram.elv[elvish/use-diagram.elv] --> github.com/giancosta86/ethereal/v1/map(github.com/giancosta86/ethereal/v1/map)'
+      'elvish/use-diagram[elvish/use-diagram] --> github.com/giancosta86/ethereal/v1/map(github.com/giancosta86/ethereal/v1/map)'
 
-      'elvish/use-diagram.elv[elvish/use-diagram.elv] --> analysis/files[analysis/files]'
+      'elvish/use-diagram[elvish/use-diagram] --> analysis/files[analysis/files]'
     ]
   }
 }
