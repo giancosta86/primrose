@@ -19,7 +19,7 @@ _Elegant file analysis in Elvish_
 
 * a **dependency diagram generator** for **Elvish**, emitting the source code of a [Mermaid](https://mermaid.ai/) flowchart.
 
-The *overall architecture* can be summarized as follows:
+The _overall architecture_ can be summarized as follows:
 
 ![Architecture](docs/architecture.svg)
 
@@ -63,7 +63,6 @@ check-uses
 
 The command also supports more options - please, refer to the [module](elvish/use-checker.elv) documentation for details.
 
-
 ### Diagram generator
 
 To make it available, it is recommended to add the following lines to **rc.elv**:
@@ -82,7 +81,14 @@ Then, in your project directory, just run
 use-diagram
 ```
 
-The generated output can be procesed by tools supporting Mermaid's syntax - such as the related [playground](https://mermaid.ai/play) or the [command-line tool](https://www.npmjs.com/package/@mermaid-js/mermaid-cli)
+The generated output can be procesed by tools supporting the selected syntax - in particular, the `dot` command for [Graphviz](https://graphviz.org/), as well as Mermaid's [playground](https://mermaid.ai/play) or [command-line tool](https://www.npmjs.com/package/@mermaid-js/mermaid-cli).
+
+For example, in the case of Graphviz:
+
+```elvish
+use-diagram &colors |
+  dot -Tsvg -o use-diagram.svg
+```
 
 The command also supports more options - please, refer to the [module](elvish/use-diagram.elv) documentation for details.
 
@@ -107,6 +113,8 @@ Similarly, the `line-by-line` function in the `analysis/text` module provides a 
 - [Velvet](https://github.com/giancosta86/velvet) - _Smooth, functional testing in the Elvish shell_
 
 - [epm-plus](https://github.com/giancosta86/epm-plus) - _Package versioning for epm in Elvish_
+
+- [Graphviz](https://graphviz.org/) - _Open source graph visualization software_
 
 - [Mermaid](https://mermaid.ai/) - _Faster, smarter diagramming for teams —
   with markdown-style code and AI_

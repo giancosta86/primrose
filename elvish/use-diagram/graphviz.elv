@@ -1,5 +1,6 @@
 use github.com/giancosta86/ethereal/v1/set
 use ../uses
+use ./shared
 
 var -prologue = ^
 'digraph useDiagram {
@@ -15,19 +16,20 @@ var -prologue = ^
 
   node [
     shape=box,
-    style="solid",
+    style="filled",
+    fillcolor="'$shared:relative-color'",
     fontname="Helvetica-Bold",
     penwidth=2
   ];
 '
 
 var -node-suffix-by-kind = [
-  &$uses:standard=' [shape=hexagon, style=solid];'
-  &$uses:absolute=' [shape=box, style="rounded,solid"];'
+  &$uses:standard=' [shape=hexagon, style=filled, fillcolor="'$shared:standard-color'"];'
+  &$uses:absolute=' [shape=box, style="rounded,filled", fillcolor="'$shared:absolute-color'"];'
   &$uses:relative=';'
 ]
 
-fn create-diagram-printer {
+fn create-diagram-printer { |&colors=$false|
   var use-declarations = $set:empty
   var reference-pairs = []
 

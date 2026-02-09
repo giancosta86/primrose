@@ -10,13 +10,15 @@ use ./uses
 #
 # It supports the following flags:
 #
+# * `colors`: to add colors to the diagram.
+#
 # * `format`: the output format; the command currently supports `graphviz` and `mermaid`.
 #
 # * `include-tests`: enable checks for `.test.elv` files, too. Disabled by default.
 #
 # * `kinds`: the list of `use` declarations that must be taken into account when creating the diagram; all the kinds are included by default.
 #
-fn use-diagram { |&format=graphviz &include-tests=$false &kinds=[$uses:standard $uses:absolute $uses:relative]|
+fn use-diagram { |&colors=$false &format=graphviz &include-tests=$false &kinds=[$uses:standard $uses:absolute $uses:relative]|
   var use-analyzer = (use-analyzer:create &kinds=$kinds)
 
   var provider-module = (
@@ -29,7 +31,7 @@ fn use-diagram { |&format=graphviz &include-tests=$false &kinds=[$uses:standard 
     }
   )
 
-  var diagram-printer = ($provider-module[create-diagram-printer~])
+  var diagram-printer = ($provider-module[create-diagram-printer~] &colors=$colors)
 
   $diagram-printer[start]
 
