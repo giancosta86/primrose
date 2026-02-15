@@ -86,8 +86,7 @@ The generated output can be procesed by tools supporting the selected syntax - i
 For example, in the case of Graphviz:
 
 ```elvish
-use-diagram &colors |
-  dot -Tsvg -o use-diagram.svg
+use-diagram &colors | dot -Tsvg -o use-diagram.svg
 ```
 
 The command also supports more options - please, refer to the [module](elvish/use-diagram.elv) documentation for details.
