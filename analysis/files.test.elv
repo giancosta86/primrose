@@ -20,7 +20,7 @@ fn file-length-analyzer { |_ content|
   ]
 }
 
-fn more-sophisticated-analyzer { |path content|
+fn more-sophisticated-analyzer { |_ content|
   put [
     &text=$content
     &length=(count $content)
@@ -92,26 +92,51 @@ fn beta-excluding-analyzer { |path content|
     }
 
     >> 'should support multiple analyzers' {
-      with-temp-sources { |temp-files|
-        all $temp-files |
-          files:analyze $file-length-analyzer~ $more-sophisticated-analyzer~ |
-          should-be [
-            &alpha.elv=[
-              &text-and-length=[Alpha (num 5)]
-              &text=Alpha
-              &length=5
+      >> 'in a basic case' {
+        with-temp-sources { |temp-files|
+          all $temp-files |
+            files:analyze $file-length-analyzer~ $more-sophisticated-analyzer~ |
+            should-be [
+              &alpha.elv=[
+                &text-and-length=[Alpha (num 5)]
+                &text=Alpha
+                &length=5
+              ]
+              &beta.elv=[
+                &text-and-length=[Beta (num 4)]
+                &text=Beta
+                &length=4
+              ]
+              &gamma.elv=[
+                &text-and-length=[Gamma (num 5)]
+                &text=Gamma
+                &length=5
+              ]
             ]
-            &beta.elv=[
-              &text-and-length=[Beta (num 4)]
-              &text=Beta
-              &length=4
+        }
+      }
+
+      >> 'when one of them returns $nil' {
+        with-temp-sources { |temp-files|
+          all $temp-files |
+            files:analyze $beta-excluding-analyzer~ $more-sophisticated-analyzer~ |
+            should-be [
+              &alpha.elv=[
+                &text-and-length=[Alpha (num 5)]
+                &text=Alpha
+                &length=5
+              ]
+              &beta.elv=[
+                &text=Beta
+                &length=4
+              ]
+              &gamma.elv=[
+                &text-and-length=[Gamma (num 5)]
+                &text=Gamma
+                &length=5
+              ]
             ]
-            &gamma.elv=[
-              &text-and-length=[Gamma (num 5)]
-              &text=Gamma
-              &length=5
-            ]
-          ]
+        }
       }
     }
 

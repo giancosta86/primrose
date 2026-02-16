@@ -19,9 +19,9 @@ fn -create-chunk-analysis-function { |analyzers|
     all $file-paths-in-chunk | seq:reduce [&] { |results-by-file file-path|
       var file-content = (slurp < $file-path)
 
-      var analyzer-results = (-run-analyzers-on-file $analyzers $file-path $file-content)
+      var analysis = (-run-analyzers-on-file $analyzers $file-path $file-content)
 
-      seq:assoc-substantial $results-by-file $file-path $analyzer-results
+      seq:assoc-substantial $results-by-file $file-path $analysis
     }
   }
 }
@@ -32,7 +32,7 @@ fn -create-chunk-analysis-function { |analyzers|
 #
 # * for keys, the files having at least an analyzer result
 #
-# * as each value, a map whose keys are populated by the analyzers
+# * as each value, a sub-map whose keys are populated by the analyzers
 #
 # Analyzers are merely *functions* receving two arguments:
 #
@@ -40,10 +40,10 @@ fn -create-chunk-analysis-function { |analyzers|
 #
 # * the text content of such files
 #
-# and the output can be:
+# and their output can be:
 #
 # * a *map*, that will be merged with the maps created by the other analyzers so as to create
-#   the overall map of results associated with the file
+#   the overall sub-map of results associated with the file
 #
 # * $nil, if the analyzer has nothing to associate with such file
 #
@@ -51,7 +51,7 @@ fn -create-chunk-analysis-function { |analyzers|
 #
 # Please, note: this function is not designed to work with large files - because it keeps in memory the entire content of each file, for performance reasons.
 #
-# Please, note: by default, this function opens multiple files at a time and runs analyzers on them in parallel - beware of aspects such as the current working directory, external files, shared memory, and more!
+# Please, note: by default, this function opens multiple files at a time and runs analyzers on them in parallel - beware of aspects involving a shared context, such as the current working directory!
 #
 fn analyze { |&num-workers=$parallel:DEFAULT-NUM-WORKERS @analyzers|
   var analyze-chunk-of-files~ = (-create-chunk-analysis-function $analyzers)

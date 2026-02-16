@@ -14,21 +14,12 @@ use ./text
       )
 
       text:line-by-line $text { |line-number line|
-        put [$line-number $line]
+        put '--- '$line-number': '$line' ---'
       } |
         should-emit [
-          [
-            1
-            'First line'
-          ]
-          [
-            2
-            'Second line'
-          ]
-          [
-            3
-            'Third line'
-          ]
+          '--- 1: First line ---'
+          '--- 2: Second line ---'
+          '--- 3: Third line ---'
         ]
     }
   }
