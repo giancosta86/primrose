@@ -67,7 +67,7 @@ var expected-relative-uses = [
     &reference=../beta
     &alias=bt
     &namespace=bt
-    &kind=R
+    &kind=$uses:relative
   ]
 ]
 
@@ -109,7 +109,7 @@ fn expect-uses { |&kinds=$nil expected-uses|
       expect-uses &kinds=[$uses:standard] $expected-standard-uses
     }
 
-    >> 'when requesting a set of kinds of uses' {
+    >> 'when requesting a subset of kinds of uses' {
       expect-uses &kinds=[$uses:standard $uses:relative] [
         $@expected-standard-uses
         $@expected-relative-uses

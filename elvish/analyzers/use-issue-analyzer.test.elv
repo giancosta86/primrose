@@ -18,7 +18,9 @@ fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &
       slurp
   )
 
-  var analyzer = (use-issue-analyzer:create &superfluous-uses=$superfluous-uses &dangling-identifiers=$dangling-identifiers &missing-relative-uses=$missing-relative-uses)
+  var analyzer = (
+    use-issue-analyzer:create &superfluous-uses=$superfluous-uses &dangling-identifiers=$dangling-identifiers &missing-relative-uses=$missing-relative-uses
+  )
 
   var actual-warning-map = ($analyzer (src)[name] $source-code)
 
@@ -167,6 +169,27 @@ fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &
             ]
           ]
         }
+      }
+
+      >> 'when disabling only one flag' {
+        all $lines-with-all-issues | should-emit-warnings &superfluous-uses=$false [
+            &dangling-identifiers=[
+              [
+                &line-number=4
+                &namespace=cip
+                &identifier=f
+              ]
+            ]
+            &missing-relative-uses=[
+              [
+                &line-number=2
+                &reference=./DODO
+                &alias=$nil
+                &namespace=DODO
+                &kind=$uses:relative
+              ]
+            ]
+          ]
       }
 
       >> 'when disabling all flags' {

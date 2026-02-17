@@ -47,7 +47,7 @@ use ./qualified-identifiers
         ]
     }
 
-    >> 'parsing a redirection merged with a scoped variable' {
+    >> 'parsing a redirection together with a scoped variable' {
       qualified-identifiers:find-all 'echo Test 2>$os:dev-null' |
         should-be [
           &line-number=1
@@ -82,7 +82,7 @@ use ./qualified-identifiers
     all [
       'This is some sample string that should be a source code file.
 
-      Colons followed by spaces like this: should not be parsed. Nor :a, :b or similar ones.
+      Colons followed by spaces like this: should not be parsed. Nor :a, :b, ...
 
       * Basic identifier -> alpha:beta
 
@@ -95,7 +95,7 @@ use ./qualified-identifiers
     ] |
       to-lines |
       slurp |
-      qualified-identifiers:find-all (all) |
+      qualified-identifiers:find-all |
       should-emit [
         [
           &line-number=5

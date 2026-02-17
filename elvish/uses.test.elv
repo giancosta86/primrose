@@ -15,7 +15,8 @@ use ./uses
     }
 
     >> 'with alias' {
-      uses:find-all 'use str std-str' |
+      put 'use str std-str' |
+        uses:find-all |
         should-be [
           &line-number=1
           &reference=str
@@ -90,7 +91,8 @@ use ./uses
     )
 
     >> 'by default' {
-      uses:find-all $source-code |
+      put $source-code |
+        uses:find-all |
         should-emit [
           [
             &line-number=1

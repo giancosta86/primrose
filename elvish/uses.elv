@@ -1,5 +1,6 @@
 use re
 use str
+use github.com/giancosta86/ethereal/v1/lang
 use github.com/giancosta86/ethereal/v1/seq
 use ../analysis/text
 
@@ -10,7 +11,7 @@ var relative = 'R'
 var -use-regex = '(?m)^\s*use\s+(\S+)(?:\s+(\S+))?\s*(?:#.*)?$'
 
 #
-# Emits all the `use` declarations in the given Elvish source code.
+# Emits all the `use` declarations of the requested kinds in the given Elvish source code.
 #
 # Each declaration is emitted as a map containing the following fields:
 #
@@ -20,18 +21,22 @@ var -use-regex = '(?m)^\s*use\s+(\S+)(?:\s+(\S+))?\s*(?:#.*)?$'
 #
 # * `alias`: the alias used to import the module, or $nil
 #
-# * `namespace`: the namespace used to access the module; if coincides with `alias` if it's not $nil,
+# * `namespace`: the namespace used to access the module; it coincides with `alias` if it's not $nil,
 #   otherwise it's the last path component in `reference`
 #
 # * `kind`: can be one of the 3 constants provided by this module:
 #
-#   * `standard` (**S**): the module belongs to the Elvish library
+#   * `standard` (**S**): module belonging to the Elvish standard library
 #
 #   * `absolute` (**A**): external, fully-qualified module
 #
-#   * 'relative' (**R**): module whose path is relative to the importing module
+#   * 'relative' (**R**): module imported via a relative path
 #
-fn find-all { |&kinds=[$standard $absolute $relative] source-code|
+# Each `use` declarations can appear at any indentation level within a non-comment line, and it must be its only instruction.
+#
+fn find-all { |&kinds=[$standard $absolute $relative] @arguments|
+  var source-code = (lang:get-single-input $arguments)
+
   text:line-by-line $source-code { |line-number line|
     re:find $-use-regex $line | each { |match|
       var groups = $match[groups]
@@ -42,7 +47,7 @@ fn find-all { |&kinds=[$standard $absolute $relative] source-code|
       var reference-components = [(str:split / $reference)]
 
       var kind = (
-        if (==s $reference[0] '.') {
+        if (eq $reference[0] '.') {
           put $relative
         } elif (== 1 (count $reference-components)) {
           put $standard

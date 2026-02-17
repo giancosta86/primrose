@@ -10,17 +10,17 @@ use ../uses
 #
 # In particular, its flags enable the following checks:
 #
-# * `superfluous-uses`: the list of *use declarations* of modules that are imported but never referenced in identifiers by the current module - in the format provided by `elvish/uses:find-all`.
+# * `superfluous-uses`: the list of *use declarations* for modules that are imported but never referenced in identifiers by the current module - in the format provided by `elvish/uses:find-all`.
 #
 # * `dangling-identifiers`: the list of *qualified identifiers* whose namespace is not provided by an imported module; their format is the one emitted by `elvish/qualified-identifiers:find-all`.
 #
-# * `missing-relative-uses`: the list of *use declarations* of **relative modules** that are imported by the current module but do not exist in the file system; the format is the one of `elvish/uses:find-all`
+# * `missing-relative-uses`: the list of *use declarations* for **relative modules** that are imported by the current module but do not exist in the file system; the format is the one of `elvish/uses:find-all`.
 #
 # Each active flag adds a corresponding key to the analyzer's result map - but only if the related list is not empty; the final result is such map if it has at least one key, otherwise $nil is emitted.
 #
 fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
   put { |source-path source-code|
-    if (not (and $superfluous-uses $dangling-identifiers $missing-relative-uses)) {
+    if (not (or $superfluous-uses $dangling-identifiers $missing-relative-uses)) {
       put $nil
       return
     }
@@ -72,12 +72,12 @@ fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relati
         all $uses |
           keep-if { |use-declaration| eq $use-declaration[kind] $uses:relative } |
           each { |relative-use|
-            var actual-file-path = (
+            var actual-referenced-path = (
               path:dir $source-path |
                 path:join (all) $relative-use[reference]
             )'.elv'
 
-            if (not (os:is-regular $actual-file-path)) {
+            if (not (os:is-regular $actual-referenced-path)) {
               put $relative-use
             }
           }
