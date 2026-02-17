@@ -3,10 +3,10 @@ use github.com/giancosta86/ethereal/v1/seq
 use ../analysis/files
 use ./analyzers/use-issue-analyzer
 
-fn -log-issue { |file-path issue|
+fn -log-issue { |file-path line-number|
   var message = (one)
 
-  echo (styled $file-path':'$issue[line-number]': ' white bold)$message
+  echo (styled $file-path':'$line-number': ' white bold)$message
 }
 
 fn -order-in-file {
@@ -14,41 +14,35 @@ fn -order-in-file {
     order &key=(seq:make-getter line-number)
 }
 
-fn -print-file-issues { |file-path issues|
-  if (has-key $issues missing-relative-uses) {
-    all $issues[missing-relative-uses] |
+fn -try-to-print-issues { |file-path issues kind single-description color message-getter|
+  if (has-key $issues $kind) {
+    all $issues[$kind] |
       -order-in-file |
-      each { |missing-relative-use|
-        put (styled 'Missing relative use: ' red bold)': '$missing-relative-use[reference] |
-          -log-issue $file-path $missing-relative-use
-      }
-  }
+      each { |issue|
+        var message = ($message-getter $issue)
 
-  if (has-key $issues dangling-identifiers) {
-    all $issues[dangling-identifiers] |
-      -order-in-file |
-      each { |dangling-identifier|
-        put (styled 'Dangling identifier: ' yellow bold)': '$dangling-identifier[namespace]':'$dangling-identifier[identifier] |
-          -log-issue $file-path $dangling-identifier
-      }
-  }
-
-  if (has-key $issues superfluous-uses) {
-    all $issues[superfluous-uses] |
-      -order-in-file |
-      each { |superfluous-use|
-        put (styled 'Superfluous use: ' yellow bold)': '$superfluous-use[reference] |
-          -log-issue $file-path $superfluous-use
+        put (styled $single-description $color bold)': '$message |
+          -log-issue $file-path $issue[line-number]
       }
   }
 }
 
-fn -format-issues { |issues|
-  if (seq:is-non-empty $issues) {
-    keys $issues |
+fn -print-file-issues { |file-path issues|
+  -try-to-print-issues $file-path $issues missing-relative-uses 'Missing relative use' red (seq:make-getter reference)
+
+  -try-to-print-issues $file-path $issues dangling-identifiers 'Dangling identifier' yellow { |dangling-identifier|
+    put $dangling-identifier[namespace]':'$dangling-identifier[identifier]
+  }
+
+  -try-to-print-issues $file-path $issues superfluous-uses 'Superfluous use' yellow (seq:make-getter reference)
+}
+
+fn -format-issues { |issues-by-file|
+  if (seq:is-non-empty $issues-by-file) {
+    keys $issues-by-file |
       order |
       each { |file-path|
-        -print-file-issues $file-path $issues[$file-path]
+        -print-file-issues $file-path $issues-by-file[$file-path]
       }
   } else {
     echo (styled 'No issues detected' green bold)
@@ -67,19 +61,21 @@ fn -format-issues { |issues|
 # * `superfluous-uses`, `dangling-identifiers`, `missing-relative-uses`: the supported issue types. All enabled by default.
 #
 fn check-uses { |&include-tests=$false &raw=$false &superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
-  var issues = (
+  var analyzer = (
+    use-issue-analyzer:create ^
+      &superfluous-uses=$superfluous-uses ^
+      &dangling-identifiers=$dangling-identifiers ^
+      &missing-relative-uses=$missing-relative-uses
+  )
+
+  var issues-by-file = (
     fs:find-scripts &include-tests=$include-tests |
-      files:analyze (
-        use-issue-analyzer:create ^
-          &superfluous-uses=$superfluous-uses ^
-          &dangling-identifiers=$dangling-identifiers ^
-          &missing-relative-uses=$missing-relative-uses
-      )
+      files:analyze $analyzer
   )
 
   if $raw {
-    put $issues
+    put $issues-by-file
   } else {
-    -format-issues $issues
+    -format-issues $issues-by-file
   }
 }

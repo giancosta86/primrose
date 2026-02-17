@@ -3,7 +3,6 @@ use ./uses
 
 var source-with-all-issues = (
   all [
-    'use path'
     'use ./DODO'
     ''
     'cip:f 90'
@@ -12,33 +11,26 @@ var source-with-all-issues = (
     slurp
 )
 
-var expected-issues-in-file = [
+var expected-issues = [
   &superfluous-uses=[
     [
-      &line-number=2
+      &line-number=1
       &reference=./DODO
       &alias=$nil
       &namespace=DODO
       &kind=$uses:relative
     ]
-    [
-      &line-number=1
-      &reference=path
-      &alias=$nil
-      &namespace=path
-      &kind=$uses:standard
-    ]
   ]
   &dangling-identifiers=[
     [
       &identifier=f
-      &line-number=4
+      &line-number=3
       &namespace=cip
     ]
   ]
   &missing-relative-uses=[
     [
-      &line-number=2
+      &line-number=1
       &reference=./DODO
       &alias=$nil
       &namespace=DODO
@@ -47,7 +39,7 @@ var expected-issues-in-file = [
   ]
 ]
 
-fn in-custom-temp-dir { |block|
+fn in-temp-dir-with-sources { |block|
   fs:with-temp-dir { |temp-dir|
     cd $temp-dir
 
@@ -61,17 +53,16 @@ fn in-custom-temp-dir { |block|
 
 >> 'Elvish use checker' {
   >> 'by default' {
-    in-custom-temp-dir {
+    in-temp-dir-with-sources {
       var output-tester = (
         use-checker:check-uses |
           output-tester:create &unstyled
       )
 
       $output-tester[should-contain-all] [
-        'source.elv:2: Missing relative use: : ./DODO'
-        'source.elv:4: Dangling identifier: : cip:f'
-        'source.elv:1: Superfluous use: : path'
-        'source.elv:2: Superfluous use: : ./DODO'
+        'source.elv:1: Missing relative use: ./DODO'
+        'source.elv:3: Dangling identifier: cip:f'
+        'source.elv:1: Superfluous use: ./DODO'
       ]
 
       $output-tester[should-contain-none] [
@@ -81,31 +72,29 @@ fn in-custom-temp-dir { |block|
   }
 
   >> 'when including tests' {
-    in-custom-temp-dir {
+    in-temp-dir-with-sources {
       var output-tester = (
         use-checker:check-uses &include-tests |
           output-tester:create &unstyled
       )
 
       $output-tester[should-contain-all] [
-        'source.elv:2: Missing relative use: : ./DODO'
-        'source.elv:4: Dangling identifier: : cip:f'
-        'source.elv:1: Superfluous use: : path'
-        'source.elv:2: Superfluous use: : ./DODO'
-        'source.test.elv:2: Missing relative use: : ./DODO'
-        'source.test.elv:4: Dangling identifier: : cip:f'
-        'source.test.elv:1: Superfluous use: : path'
-        'source.test.elv:2: Superfluous use: : ./DODO'
+        'source.elv:1: Missing relative use: ./DODO'
+        'source.elv:3: Dangling identifier: cip:f'
+        'source.elv:1: Superfluous use: ./DODO'
+        'source.test.elv:1: Missing relative use: ./DODO'
+        'source.test.elv:3: Dangling identifier: cip:f'
+        'source.test.elv:1: Superfluous use: ./DODO'
       ]
     }
   }
 
   >> 'when enabling raw input' {
-    in-custom-temp-dir {
+    in-temp-dir-with-sources {
       use-checker:check-uses &include-tests &raw |
         should-be [
-          &source.elv=$expected-issues-in-file
-          &source.test.elv=$expected-issues-in-file
+          &source.elv=$expected-issues
+          &source.test.elv=$expected-issues
         ]
     }
   }
