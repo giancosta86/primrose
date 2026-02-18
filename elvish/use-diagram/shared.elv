@@ -1,3 +1,5 @@
-var standard-color = "#f0e2fd"
-var absolute-color = "#e0fffc"
-var relative-color = "#fffec7"
+var use-colors-by-class-name = [
+  &standard='#f0e2fd'
+  &absolute='#e0fffc'
+  &relative='#fffec7'
+]

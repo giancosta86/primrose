@@ -14,34 +14,35 @@ fn -relative-node { |reference|
   put $reference'['$reference']'
 }
 
-fn -node { |source-module use-declaration|
-  var kind = $use-declaration[kind]
+var -node-renderers-by-kind = [
+  &$uses:standard=$-standard-node~
+  &$uses:absolute=$-absolute-node~
+  &$uses:relative=$-relative-node~
+]
 
-  if (eq $kind $uses:standard) {
-    -standard-node $use-declaration[actual-reference]
-  } elif (eq $kind $uses:absolute) {
-    -absolute-node $use-declaration[actual-reference]
-  } elif (eq $kind $uses:relative) {
-    -relative-node $use-declaration[actual-reference]
-  } else {
-    fail 'Unknown node kind: '$kind
-  }
+fn -node { |use-declaration|
+  var kind = $use-declaration[kind]
+  var node-renderer = $-node-renderers-by-kind[$kind]
+
+  $node-renderer $use-declaration[resolved-reference]
 }
 
-fn -class { |class-name module-set fill|
+fn -class { |class-name reference-set|
   echo
 
-  echo '  'classDef $class-name 'fill:'$fill
+  echo '  'classDef $class-name 'fill:'$shared:use-colors-by-class-name[$class-name]
 
-  set:iterate $module-set { |module|
-    echo '  '$module':::'$class-name
+  set:iterate $reference-set { |reference|
+    echo '  '$reference':::'$class-name
   }
 }
 
 fn create-diagram-printer { |&colors=$false|
-  var standard-modules = $set:empty
-  var absolute-modules = $set:empty
-  var relative-modules = $set:empty
+  var mentioned-references = [
+    &$uses:standard=$set:empty
+    &$uses:absolute=$set:empty
+    &$uses:relative=$set:empty
+  ]
 
   put [
     &start={
@@ -56,31 +57,25 @@ fn create-diagram-printer { |&colors=$false|
         each $echo~
     }
 
-    &notify-use-declaration={ |source-module use-declaration|
+    &on-use-declaration={ |source-module use-declaration|
       if $colors {
-        set relative-modules = (set:add $relative-modules $source-module)
+        set mentioned-references[$uses:relative] = (set:add $mentioned-references[$uses:relative] $source-module)
 
-        if (eq $use-declaration[kind] $uses:standard) {
-          set standard-modules = (set:add $standard-modules $use-declaration[actual-reference])
-        } elif (eq $use-declaration[kind] $uses:absolute) {
-          set absolute-modules = (set:add $absolute-modules $use-declaration[actual-reference])
-        } elif (eq $use-declaration[kind] $uses:relative) {
-          set relative-modules = (set:add $relative-modules $use-declaration[actual-reference])
-        } else {
-          fail 'Unknown use declaration kind: '$use-declaration[kind]
-        }
+        var kind = $use-declaration[kind]
+
+        set mentioned-references[$kind] = (set:add $mentioned-references[$kind] $use-declaration[resolved-reference])
       }
 
-      echo '  '(-relative-node $source-module)' --> '(-node $source-module $use-declaration)
+      echo '  '(-relative-node $source-module)' --> '(-node $use-declaration)
     }
 
     &finish={
       if $colors {
-        -class standard $standard-modules $shared:standard-color
+        -class standard $mentioned-references[$uses:standard]
 
-        -class absolute $absolute-modules $shared:absolute-color
+        -class absolute $mentioned-references[$uses:absolute]
 
-        -class relative $relative-modules $shared:relative-color
+        -class relative $mentioned-references[$uses:relative]
       }
     }
   ]
