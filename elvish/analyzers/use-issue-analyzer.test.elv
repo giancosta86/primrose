@@ -13,8 +13,7 @@ fn to-map-of-sets { |@arguments|
 
 fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true expected-warning-map|
   var source-code = (
-    all |
-      to-lines |
+    to-lines |
       slurp
   )
 

@@ -10,8 +10,7 @@ fn -log-issue { |file-path line-number|
 }
 
 fn -order-in-file {
-  all |
-    order &key=(seq:make-getter line-number)
+  order &key=(seq:make-getter line-number)
 }
 
 fn -try-to-print-issues { |file-path issues kind single-description color message-getter|
