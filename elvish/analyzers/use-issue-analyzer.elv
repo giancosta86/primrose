@@ -30,7 +30,7 @@ fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relati
     var uses = [(uses:find-all $source-code)]
 
     if (or $superfluous-uses $dangling-identifiers) {
-      var uses-by-namespace = (seq:group-by $uses (seq:make-getter namespace))
+      var uses-by-namespace = (seq:to-map $uses (seq:make-getter namespace))
 
       var identifiers-by-namespace = (
         qualified-identifiers:find-all $source-code |
