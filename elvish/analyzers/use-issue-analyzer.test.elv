@@ -6,7 +6,7 @@ use ./use-issue-analyzer
 
 fn to-map-of-sets { |@arguments|
   lang:get-single-input $arguments |
-    map:transform (all) { |key value|
+    map:transform { |key value|
       put [$key (set:from $value)]
     }
 }
