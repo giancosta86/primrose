@@ -54,38 +54,39 @@ fn in-temp-dir-with-sources { |block|
 >> 'Elvish use checker' {
   >> 'by default' {
     in-temp-dir-with-sources {
-      var output-tester = (
-        use-checker:check-uses |
-          output-tester:create &unstyled
+      var output = (
+        capture {
+          use-checker:check-uses
+        }
       )
 
-      $output-tester[should-contain-all] [
-        'source.elv:1: Missing relative use: ./DODO'
-        'source.elv:3: Dangling identifier: cip:f'
-        'source.elv:1: Superfluous use: ./DODO'
-      ]
+      put $output |
+        should-contain-all [
+          'source.elv:1: Missing relative use: ./DODO'
+          'source.elv:3: Dangling identifier: cip:f'
+          'source.elv:1: Superfluous use: ./DODO'
+        ]
 
-      $output-tester[should-contain-none] [
-        'source.test.elv'
-      ]
+      put $output |
+        should-contain-none [
+          'source.test.elv'
+        ]
     }
   }
 
   >> 'when including tests' {
     in-temp-dir-with-sources {
-      var output-tester = (
-        use-checker:check-uses &include-tests |
-          output-tester:create &unstyled
-      )
-
-      $output-tester[should-contain-all] [
-        'source.elv:1: Missing relative use: ./DODO'
-        'source.elv:3: Dangling identifier: cip:f'
-        'source.elv:1: Superfluous use: ./DODO'
-        'source.test.elv:1: Missing relative use: ./DODO'
-        'source.test.elv:3: Dangling identifier: cip:f'
-        'source.test.elv:1: Superfluous use: ./DODO'
-      ]
+      capture {
+        use-checker:check-uses &include-tests
+      } |
+        should-contain-all [
+          'source.elv:1: Missing relative use: ./DODO'
+          'source.elv:3: Dangling identifier: cip:f'
+          'source.elv:1: Superfluous use: ./DODO'
+          'source.test.elv:1: Missing relative use: ./DODO'
+          'source.test.elv:3: Dangling identifier: cip:f'
+          'source.test.elv:1: Superfluous use: ./DODO'
+        ]
     }
   }
 

@@ -24,26 +24,27 @@ use ./use-diagram/shared
     ]
 
     >> 'without colors' {
-      var output-tester = (
-        use-diagram:use-diagram &format=graphviz |
-          output-tester:create
+      var output = (
+        capture {
+          use-diagram:use-diagram &format=graphviz
+        }
       )
 
-      $output-tester[should-contain-all] $always-displayed-lines
+      put $output |
+        should-contain-all $always-displayed-lines
 
-      $output-tester[should-contain-none] $color-lines
+      put $output |
+        should-contain-none $color-lines
     }
 
     >> 'with colors' {
-      var output-tester = (
-        use-diagram:use-diagram &colors &format=graphviz |
-          output-tester:create
-      )
-
-      $output-tester[should-contain-all] [
-        $@always-displayed-lines
-        $@color-lines
-      ]
+      capture {
+        use-diagram:use-diagram &colors &format=graphviz
+      } |
+        should-contain-all [
+          $@always-displayed-lines
+          $@color-lines
+        ]
     }
   }
 
@@ -72,26 +73,27 @@ use ./use-diagram/shared
     ]
 
     >> 'without colors' {
-      var output-tester = (
-        use-diagram:use-diagram &format=mermaid |
-          output-tester:create
+      var output = (
+        capture {
+          use-diagram:use-diagram &format=mermaid
+        }
       )
 
-      $output-tester[should-contain-all] $always-displayed-lines
+      put $output |
+        should-contain-all $always-displayed-lines
 
-      $output-tester[should-contain-none] $color-lines
+      put $output |
+        should-contain-none $color-lines
     }
 
     >> 'with colors' {
-      var output-tester = (
-        use-diagram:use-diagram &colors &format=mermaid |
-          output-tester:create
-      )
-
-      $output-tester[should-contain-all] [
-        $@always-displayed-lines
-        $@color-lines
-      ]
+      capture {
+        use-diagram:use-diagram &colors &format=mermaid
+      } |
+        should-contain-all [
+          $@always-displayed-lines
+          $@color-lines
+        ]
     }
   }
 }
