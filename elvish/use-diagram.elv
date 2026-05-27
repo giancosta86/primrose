@@ -29,7 +29,9 @@ fn use-diagram { |&colors=$false &format=graphviz &include-tests=$false &kinds=[
     ]
   )
 
-  var diagram-printer = ($provider-module[create-diagram-printer~] &colors=$colors)
+  var diagram-printer = (
+    $provider-module[create-diagram-printer~] &colors=$colors
+  )
 
   $diagram-printer[start]
 

@@ -6,15 +6,14 @@ use ./use-issue-analyzer
 
 fn to-map-of-sets { |@arguments|
   lang:get-single-input $arguments |
-    map:transform (all) { |key value|
+    map:transform { |key value|
       put [$key (set:from $value)]
     }
 }
 
 fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true expected-warning-map|
   var source-code = (
-    all |
-      to-lines |
+    to-lines |
       slurp
   )
 
@@ -34,168 +33,170 @@ fn should-emit-warnings { |&superfluous-uses=$true &dangling-identifiers=$true &
   }
 }
 
->> 'Elvish analyzers' {
-  >> 'use issue analyzer' {
-    >> 'when there are no warnings' {
-      >> 'should emit $nil' {
-        all [] |
-          should-emit-warnings $nil
+>> 'Elvish' {
+  >> 'analyzers' {
+    >> 'use issue analyzer' {
+      >> 'when there are no warnings' {
+        >> 'should emit $nil' {
+          all [] |
+            should-emit-warnings $nil
+        }
       }
-    }
 
-    >> 'should find superfluous uses' {
-      all [
-        'use str'
-        'use github.com/giancosta86/velvet/v3/assertions'
-        'use ../qualified-identifiers'
-      ] |
-        should-emit-warnings [
-          &superfluous-uses=[
-            [
-              &line-number=1
-              &reference=str
-              &alias=$nil
-              &namespace=str
-              &kind=$uses:standard
-            ]
-            [
-              &line-number=2
-              &reference=github.com/giancosta86/velvet/v3/assertions
-              &alias=$nil
-              &namespace=assertions
-              &kind=$uses:absolute
-            ]
-            [
-              &line-number=3
-              &reference=../qualified-identifiers
-              &alias=$nil
-              &namespace=qualified-identifiers
-              &kind=$uses:relative
-            ]
-          ]
-        ]
-    }
-
-    >> 'should find dangling identifiers' {
-      all [
-        'path:join X Y Z'
-        'ro:sigma 95'
-      ] |
-        should-emit-warnings [
-          &dangling-identifiers=[
-            [
-              &line-number=1
-              &namespace=path
-              &identifier=join
-            ]
-            [
-              &line-number=2
-              &namespace=ro
-              &identifier=sigma
-            ]
-          ]
-        ]
-    }
-
-    >> 'should find missing relative uses' {
-      all [
-        'use ./SOMETHING'
-        'use ./SOMETHING-ELSE dodo'
-        SOMETHING:f
-        dodo:g
-      ] |
-        should-emit-warnings [
-          &missing-relative-uses=[
-            [
-              &line-number=1
-              &reference=./SOMETHING
-              &alias=$nil
-              &namespace=SOMETHING
-              &kind=$uses:relative
-            ]
-            [
-              &line-number=2
-              &reference=./SOMETHING-ELSE
-              &alias=dodo
-              &namespace=dodo
-              &kind=$uses:relative
-            ]
-        ]
-      ]
-    }
-
-    >> 'in source code with all the issue kinds' {
-      var lines-with-all-issues = [
-        'use path'
-        'use ./DODO'
-        ''
-        'cip:f 90'
-      ]
-
-      >> 'by default' {
-        >> 'should find all issues at once' {
-          all $lines-with-all-issues | should-emit-warnings [
+      >> 'should find superfluous uses' {
+        all [
+          'use str'
+          'use github.com/giancosta86/velvet/v3/assertions'
+          'use ../qualified-identifiers'
+        ] |
+          should-emit-warnings [
             &superfluous-uses=[
               [
                 &line-number=1
-                &reference=path
+                &reference=str
                 &alias=$nil
-                &namespace=path
+                &namespace=str
                 &kind=$uses:standard
               ]
               [
                 &line-number=2
-                &reference=./DODO
+                &reference=github.com/giancosta86/velvet/v3/assertions
                 &alias=$nil
-                &namespace=DODO
-                &kind=$uses:relative
+                &namespace=assertions
+                &kind=$uses:absolute
               ]
-            ]
-            &dangling-identifiers=[
               [
-                &line-number=4
-                &namespace=cip
-                &identifier=f
-              ]
-            ]
-            &missing-relative-uses=[
-              [
-                &line-number=2
-                &reference=./DODO
+                &line-number=3
+                &reference=../qualified-identifiers
                 &alias=$nil
-                &namespace=DODO
+                &namespace=qualified-identifiers
                 &kind=$uses:relative
               ]
             ]
           ]
+      }
+
+      >> 'should find dangling identifiers' {
+        all [
+          'path:join X Y Z'
+          'ro:sigma 95'
+        ] |
+          should-emit-warnings [
+            &dangling-identifiers=[
+              [
+                &line-number=1
+                &namespace=path
+                &identifier=join
+              ]
+              [
+                &line-number=2
+                &namespace=ro
+                &identifier=sigma
+              ]
+            ]
+          ]
+      }
+
+      >> 'should find missing relative uses' {
+        all [
+          'use ./SOMETHING'
+          'use ./SOMETHING-ELSE dodo'
+          SOMETHING:f
+          dodo:g
+        ] |
+          should-emit-warnings [
+            &missing-relative-uses=[
+              [
+                &line-number=1
+                &reference=./SOMETHING
+                &alias=$nil
+                &namespace=SOMETHING
+                &kind=$uses:relative
+              ]
+              [
+                &line-number=2
+                &reference=./SOMETHING-ELSE
+                &alias=dodo
+                &namespace=dodo
+                &kind=$uses:relative
+              ]
+          ]
+        ]
+      }
+
+      >> 'in source code with all the issue kinds' {
+        var lines-with-all-issues = [
+          'use path'
+          'use ./DODO'
+          ''
+          'cip:f 90'
+        ]
+
+        >> 'by default' {
+          >> 'should find all issues at once' {
+            all $lines-with-all-issues | should-emit-warnings [
+              &superfluous-uses=[
+                [
+                  &line-number=1
+                  &reference=path
+                  &alias=$nil
+                  &namespace=path
+                  &kind=$uses:standard
+                ]
+                [
+                  &line-number=2
+                  &reference=./DODO
+                  &alias=$nil
+                  &namespace=DODO
+                  &kind=$uses:relative
+                ]
+              ]
+              &dangling-identifiers=[
+                [
+                  &line-number=4
+                  &namespace=cip
+                  &identifier=f
+                ]
+              ]
+              &missing-relative-uses=[
+                [
+                  &line-number=2
+                  &reference=./DODO
+                  &alias=$nil
+                  &namespace=DODO
+                  &kind=$uses:relative
+                ]
+              ]
+            ]
+          }
         }
-      }
 
-      >> 'when disabling only one flag' {
-        all $lines-with-all-issues | should-emit-warnings &superfluous-uses=$false [
-            &dangling-identifiers=[
-              [
-                &line-number=4
-                &namespace=cip
-                &identifier=f
+        >> 'when disabling only one flag' {
+          all $lines-with-all-issues | should-emit-warnings &superfluous-uses=$false [
+              &dangling-identifiers=[
+                [
+                  &line-number=4
+                  &namespace=cip
+                  &identifier=f
+                ]
+              ]
+              &missing-relative-uses=[
+                [
+                  &line-number=2
+                  &reference=./DODO
+                  &alias=$nil
+                  &namespace=DODO
+                  &kind=$uses:relative
+                ]
               ]
             ]
-            &missing-relative-uses=[
-              [
-                &line-number=2
-                &reference=./DODO
-                &alias=$nil
-                &namespace=DODO
-                &kind=$uses:relative
-              ]
-            ]
-          ]
-      }
+        }
 
-      >> 'when disabling all flags' {
-        >> 'should emit $nil' {
-          all $lines-with-all-issues |
-            should-emit-warnings &superfluous-uses=$false &dangling-identifiers=$false &missing-relative-uses=$false $nil
+        >> 'when disabling all flags' {
+          >> 'should emit $nil' {
+            all $lines-with-all-issues |
+              should-emit-warnings &superfluous-uses=$false &dangling-identifiers=$false &missing-relative-uses=$false $nil
+          }
         }
       }
     }

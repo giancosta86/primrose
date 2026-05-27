@@ -80,7 +80,9 @@ fn expect-uses { |&kinds=$nil expected-uses|
     }
   )
 
-  var actual-result-map = ($use-analyzer (src)[name] $test-source-code)
+  var actual-result-map = (
+    $use-analyzer (src)[name] $test-source-code
+  )
 
   if $expected-uses {
     put $actual-result-map |
@@ -93,31 +95,33 @@ fn expect-uses { |&kinds=$nil expected-uses|
   }
 }
 
->> 'Elvish analyzers' {
-  >> 'use analyzer' {
-    >> 'by default' {
-      >> 'should report all the uses' {
-        expect-uses [
+>> 'Elvish' {
+  >> 'analyzers' {
+    >> 'use analyzer' {
+      >> 'by default' {
+        >> 'should report all the uses' {
+          expect-uses [
+            $@expected-standard-uses
+            $@expected-absolute-uses
+            $@expected-relative-uses
+          ]
+        }
+      }
+
+      >> 'when requesting just a specific kind of uses' {
+        expect-uses &kinds=[$uses:standard] $expected-standard-uses
+      }
+
+      >> 'when requesting a subset of kinds of uses' {
+        expect-uses &kinds=[$uses:standard $uses:relative] [
           $@expected-standard-uses
-          $@expected-absolute-uses
           $@expected-relative-uses
         ]
       }
-    }
 
-    >> 'when requesting just a specific kind of uses' {
-      expect-uses &kinds=[$uses:standard] $expected-standard-uses
-    }
-
-    >> 'when requesting a subset of kinds of uses' {
-      expect-uses &kinds=[$uses:standard $uses:relative] [
-        $@expected-standard-uses
-        $@expected-relative-uses
-      ]
-    }
-
-    >> 'when requesting no uses' {
-      expect-uses &kinds=[] $nil
+      >> 'when requesting no uses' {
+        expect-uses &kinds=[] $nil
+      }
     }
   }
 }

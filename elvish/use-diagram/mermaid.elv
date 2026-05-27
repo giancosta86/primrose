@@ -59,11 +59,15 @@ fn create-diagram-printer { |&colors=$false|
 
     &on-use-declaration={ |source-module use-declaration|
       if $colors {
-        set mentioned-references[$uses:relative] = (set:add $mentioned-references[$uses:relative] $source-module)
+        set mentioned-references[$uses:relative] = (
+          set:add $mentioned-references[$uses:relative] $source-module
+        )
 
         var kind = $use-declaration[kind]
 
-        set mentioned-references[$kind] = (set:add $mentioned-references[$kind] $use-declaration[resolved-reference])
+        set mentioned-references[$kind] = (
+          set:add $mentioned-references[$kind] $use-declaration[resolved-reference]
+        )
       }
 
       echo '  '(-relative-node $source-module)' --> '(-node $use-declaration)

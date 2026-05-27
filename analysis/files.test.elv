@@ -2,7 +2,7 @@ use ./files
 
 fn with-temp-sources { |block|
   fs:with-temp-dir { |temp-dir|
-    tmp pwd = $temp-dir
+    cd $temp-dir
 
     print Alpha > alpha.elv
     print Beta > beta.elv

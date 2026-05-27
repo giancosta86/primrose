@@ -20,7 +20,11 @@ use ../uses
 #
 fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relative-uses=$true|
   put { |source-path source-code|
-    if (not (or $superfluous-uses $dangling-identifiers $missing-relative-uses)) {
+    if (
+      not (
+        or $superfluous-uses $dangling-identifiers $missing-relative-uses
+      )
+    ) {
       put $nil
       return
     }
@@ -30,7 +34,7 @@ fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relati
     var uses = [(uses:find-all $source-code)]
 
     if (or $superfluous-uses $dangling-identifiers) {
-      var uses-by-namespace = (seq:group-by $uses (seq:make-getter namespace))
+      var uses-by-namespace = (seq:to-map $uses (seq:make-getter namespace))
 
       var identifiers-by-namespace = (
         qualified-identifiers:find-all $source-code |
@@ -49,7 +53,9 @@ fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relati
           }
         )]
 
-        set result = (seq:assoc-substantial $result superfluous-uses $superfluous-uses)
+        set result = (
+          seq:assoc-substantial $result superfluous-uses $superfluous-uses
+        )
       }
 
       if $dangling-identifiers {
@@ -63,7 +69,9 @@ fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relati
           }
         )]
 
-        set result = (seq:assoc-substantial $result dangling-identifiers $dangling-identifiers)
+        set result = (
+          seq:assoc-substantial $result dangling-identifiers $dangling-identifiers
+        )
       }
     }
 
@@ -83,7 +91,9 @@ fn create { |&superfluous-uses=$true &dangling-identifiers=$true &missing-relati
           }
       )]
 
-      set result = (seq:assoc-substantial $result missing-relative-uses $missing-relative-uses)
+      set result = (
+        seq:assoc-substantial $result missing-relative-uses $missing-relative-uses
+      )
     }
 
     seq:empty-to-default $result
